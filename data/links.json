@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "title": "Instagram",
+    "handle": "@nasieeeev",
+    "url": "https://www.instagram.com/nasieeeev",
+    "icon": "instagram"
+  },
+  {
+    "id": "2",
+    "title": "TikTok",
+    "handle": "@extazzzy077",
+    "url": "https://www.tiktok.com/@extazzzy077",
+    "icon": "tiktok"
+  }
+]

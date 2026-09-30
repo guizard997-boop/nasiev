@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель — nasieeeev</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #141414;
+      --bg-input: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #ffffff;
+      --text-muted: #a0a0a0;
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255,255,255,0.03), transparent);
+    }
+
+    .container { max-width: 640px; margin: 0 auto; }
+
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 28px; }
+
+    /* Login */
+    .login-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 360px;
+      margin: 80px auto 0;
+    }
+    .login-box h1 { text-align: center; margin-bottom: 24px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: #555; }
+
+    .field { margin-bottom: 16px; }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 18px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: #000;
+      width: 100%;
+    }
+    .btn-primary:hover { background: #e5e5e5; }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: #1c1c1c; }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid transparent;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+    .btn-small {
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    /* Header bar */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* Links list */
+    .link-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .link-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .link-item-title {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .link-item-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    .link-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    /* Form modal-ish */
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .form-card.visible { display: block; }
+
+    .form-card h2 { font-size: 16px; margin-bottom: 18px; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 500px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px 20px;
+      font-size: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #222;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+
+    .hidden { display: none !important; }
+
+    a.back {
+      color: var(--text-muted);
+      font-size: 13px;
+      text-decoration: none;
+    }
+    a.back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <!-- Login -->
+  <div id="loginView" class="container">
+    <div class="login-box">
+      <h1>Админ-панель</h1>
+      <div class="field">
+        <label>Пароль</label>
+        <input type="password" id="passwordInput" placeholder="Введите пароль" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" id="loginBtn">Войти</button>
+      <div class="error hidden" id="loginError"></div>
+    </div>
+  </div>
+
+  <!-- Admin -->
+  <div id="adminView" class="container hidden">
+    <div class="header">
+      <div>
+        <h1>Ссылки</h1>
+        <p class="subtitle" style="margin:0">Управление социальными сетями</p>
+      </div>
+      <div class="header-actions">
+        <a href="/" class="back" target="_blank">Открыть сайт ↗</a>
+        <button class="btn-secondary btn-small" id="logoutBtn">Выйти</button>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="addBtn" style="width:auto; margin-bottom:20px">+ Добавить ссылку</button>
+
+    <!-- Form -->
+    <div class="form-card" id="formCard">
+      <h2 id="formTitle">Новая ссылка</h2>
+      <input type="hidden" id="editId">
+      <div class="form-row">
+        <div class="field">
+          <label>Название *</label>
+          <input type="text" id="fieldTitle" placeholder="Instagram">
+        </div>
+        <div class="field">
+          <label>Ник / аккаунт</label>
+          <input type="text" id="fieldHandle" placeholder="@username">
+        </div>
+      </div>
+      <div class="field">
+        <label>Ссылка *</label>
+        <input type="url" id="fieldUrl" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>Иконка</label>
+        <select id="fieldIcon">
+          <option value="instagram">Instagram</option>
+          <option value="tiktok">TikTok</option>
+          <option value="youtube">YouTube</option>
+          <option value="twitter">X / Twitter</option>
+          <option value="telegram">Telegram</option>
+          <option value="vk">VK</option>
+          <option value="github">GitHub</option>
+          <option value="discord">Discord</option>
+          <option value="link">Обычная ссылка</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary btn-small" id="saveBtn">Сохранить</button>
+        <button class="btn-secondary btn-small" id="cancelBtn">Отмена</button>
+      </div>
+    </div>
+
+    <div id="linksList"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const loginView = document.getElementById('loginView');
+    const adminView = document.getElementById('adminView');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const addBtn = document.getElementById('addBtn');
+    const formCard = document.getElementById('formCard');
+    const formTitle = document.getElementById('formTitle');
+    const editId = document.getElementById('editId');
+    const fieldTitle = document.getElementById('fieldTitle');
+    const fieldHandle = document.getElementById('fieldHandle');
+    const fieldUrl = document.getElementById('fieldUrl');
+    const fieldIcon = document.getElementById('fieldIcon');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const linksList = document.getElementById('linksList');
+    const toast = document.getElementById('toast');
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/admin/check');
+        const data = await res.json();
+        if (data.authenticated) {
+          showAdmin();
+          loadLinks();
+        } else {
+          showLogin();
+        }
+      } catch {
+        showLogin();
+      }
+    }
+
+    function showLogin() {
+      loginView.classList.remove('hidden');
+      adminView.classList.add('hidden');
+    }
+
+    function showAdmin() {
+      loginView.classList.add('hidden');
+      adminView.classList.remove('hidden');
+    }
+
+    loginBtn.addEventListener('click', async () => {
+      loginError.classList.add('hidden');
+      const password = passwordInput.value;
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showAdmin();
+          loadLinks();
+        } else {
+          loginError.textContent = data.error || 'Ошибка';
+          loginError.classList.remove('hidden');
+        }
+      } catch {
+        loginError.textContent = 'Ошибка соединения';
+        loginError.classList.remove('hidden');
+      }
+    });
+
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      showLogin();
+      passwordInput.value = '';
+    });
+
+    async function loadLinks() {
+      try {
+        const res = await fetch('/api/admin/links');
+        if (res.status === 401) {
+          showLogin();
+          return;
+        }
+        const links = await res.json();
+        if (!links.length) {
+          linksList.innerHTML = '<div class="empty">Пока нет ссылок. Нажми «Добавить ссылку»</div>';
+          return;
+        }
+        linksList.innerHTML = links.map(link => `
+          <div class="link-item" data-id="${link.id}">
+            <div class="link-item-header">
+              <div>
+                <div class="link-item-title">${escapeHtml(link.title)}</div>
+                <div class="link-item-meta">
+                  ${link.handle ? escapeHtml(link.handle) + ' · ' : ''}
+                  ${escapeHtml(link.url)}
+                </div>
+              </div>
+              <div class="link-item-actions">
+                <button class="btn-secondary btn-small" onclick="editLink('${link.id}')">Изменить</button>
+                <button class="btn-danger" onclick="deleteLink('${link.id}')">Удалить</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch {
+        linksList.innerHTML = '<div class="empty">Ошибка загрузки</div>';
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    addBtn.addEventListener('click', () => {
+      editId.value = '';
+      formTitle.textContent = 'Новая ссылка';
+      fieldTitle.value = '';
+      fieldHandle.value = '';
+      fieldUrl.value = '';
+      fieldIcon.value = 'link';
+      formCard.classList.add('visible');
+      fieldTitle.focus();
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      formCard.classList.remove('visible');
+    });
+
+    window.editLink = async function(id) {
+      const res = await fetch('/api/admin/links');
+      const links = await res.json();
+      const link = links.find(l => l.id === id);
+      if (!link) return;
+      editId.value = link.id;
+      formTitle.textContent = 'Редактировать';
+      fieldTitle.value = link.title;
+      fieldHandle.value = link.handle || '';
+      fieldUrl.value = link.url;
+      fieldIcon.value = link.icon || 'link';
+      formCard.classList.add('visible');
+      fieldTitle.focus();
+    };
+
+    window.deleteLink = async function(id) {
+      if (!confirm('Удалить эту ссылку?')) return;
+      const res = await fetch(`/api/admin/links/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('Удалено');
+        loadLinks();
+      } else {
+        showToast('Ошибка удаления');
+      }
+    };
+
+    saveBtn.addEventListener('click', async () => {
+      const title = fieldTitle.value.trim();
+      const handle = fieldHandle.value.trim();
+      const url = fieldUrl.value.trim();
+      const icon = fieldIcon.value;
+      const id = editId.value;
+
+      if (!title || !url) {
+        showToast('Заполните название и ссылку');
+        return;
+      }
+
+      const body = { title, handle, url, icon };
+
+      try {
+        let res;
+        if (id) {
+          res = await fetch(`/api/admin/links/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+        } else {
+          res = await fetch('/api/admin/links', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+        }
+
+        if (res.ok) {
+          showToast(id ? 'Сохранено' : 'Добавлено');
+          formCard.classList.remove('visible');
+          loadLinks();
+        } else {
+          const data = await res.json();
+          showToast(data.error || 'Ошибка');
+        }
+      } catch {
+        showToast('Ошибка соединения');
+      }
+    });
+
+    checkAuth();
+  </script>
+</body>
+</html>
